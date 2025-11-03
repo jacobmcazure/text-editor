@@ -12,11 +12,12 @@
 #define KILO_VERSION "0.0.1"
 #define CTRL_KEY(k) ((k) & 0x1f)
 
+//set value to large int so it does not interfere with other possible char values. other enum values are self incrementing
 enum editorKey {
-	ARROW_UP = 'w',
-	ARROW_LEFT = 'a',
-	ARROW_DOWN = 's',
-	ARROW_RIGHT = 'd'
+	ARROW_UP = 4444,
+	ARROW_LEFT,
+	ARROW_DOWN,
+	ARROW_RIGHT
 };
 
 struct editorConfig {
@@ -63,7 +64,7 @@ void enableRawMode() {
 		if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1) die("tcsetattr");
 }
 
-char editorReadKey() {
+int editorReadKey() {
 	int nread;
 	char c;
 	while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
@@ -199,7 +200,7 @@ void editorRefreshScreen() {
 
 /** input **/
 
-void editorMoveCursor(char key) {
+void editorMoveCursor(int key) {
 	switch (key) {
 		case ARROW_UP:
 			E.cy--;
@@ -217,7 +218,7 @@ void editorMoveCursor(char key) {
 }
 
 void editorProcessKeypress() {
-	char c = editorReadKey();
+	int c = editorReadKey();
 	
 	switch (c) {
 		case CTRL_KEY('q'):
