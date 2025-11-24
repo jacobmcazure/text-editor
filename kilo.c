@@ -235,6 +235,29 @@ void editorAppendRow(char *s, size_t len) {
 	E.numrows++;
 }
 
+/// @brief inserts a char into a row struct
+/// @param row the row
+/// @param at the index we want to insert the character into
+/// @param c the char we are inserting
+void editorRowInsertChar(erow *row, int at, int c) {
+		if (at < 0 || at > row->size) at = row->size;
+		row->chars = realloc(row->chars, row->size + 2); //add 2 to make room for the null byte
+		memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1); //like memcpy but safe for overlapping strings
+		row->size++;
+		row->chars[at] = c;
+		editorUpdateRow(row);
+}
+
+/** editor operations **/
+
+void editorInsertChar(int c) {
+	if (E.cy == E.numrows)  {
+		editorAppendRow(" ", 0);
+	}
+	editorRowInsertChar(&E.row[E.cy], E.cx, c);
+	E.cx++;
+}
+
 //run file name in command line as an argument when running the compiled application
 void editorOpen(char *filename) {
 	free(E.filename);
@@ -475,6 +498,10 @@ void editorProcessKeypress() {
 		case ARROW_DOWN:
 		case ARROW_RIGHT:
 			editorMoveCursor(c);
+			break;
+
+		default:
+			editorInsertChar(c);
 			break;
 	}
 }
